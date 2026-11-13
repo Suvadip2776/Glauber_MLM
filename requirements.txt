@@ -5,7 +5,7 @@ scipy
 pandas
 matplotlib
 tqdm
-datasets                  # MS MARCO seeds
+datasets>=3,<4             # MS MARCO seeds
 sentence-transformers     # embedding-drift diagnostic only
 httpx                     # needed by recent sentence-transformers
 requests                  # OpenRouter judge only

@@ -13,7 +13,7 @@ mkdir -p $O/logs
 LOG=$O/logs/status_$STAGE.txt
 nvidia-smi --query-gpu=name,memory.total --format=csv | tee -a $LOG
 
-pip install -q --no-cache-dir "numpy<2.3" scipy pandas matplotlib tqdm datasets sentence-transformers \
+pip install -q --no-cache-dir "numpy<2.3" scipy pandas matplotlib tqdm "datasets==3.6.0" "sentence-transformers==3.4.1" \
   requests httpx sentencepiece accelerate einops pyarrow 2>&1 | tail -2
 pip install -q --no-cache-dir "transformers==${TRANSFORMERS_VERSION:-4.48.3}" 2>&1 | tail -2
 
@@ -85,11 +85,19 @@ case $STAGE in
       done
     done
     ;;
-  llada_traps|dream_traps)   # rerun only the trap step of an MDM stage
-    M=$([ $STAGE = llada_traps ] && echo GSAI-ML/LLaDA-8B-Base || echo Dream-org/Dream-v0-Base-7B)
+  llada_traps|dream_traps|mdlm_traps)   # rerun only the trap step of an MDM stage
     T=${STAGE%_traps}
+    case $T in llada) M=GSAI-ML/LLaDA-8B-Base ;; dream) M=Dream-org/Dream-v0-Base-7B ;;
+      mdlm) M=kuleshov-group/mdlm-owt
+            pip install -q --no-cache-dir "flash-attn==2.7.4.post1" --no-build-isolation 2>&1 | tail -2 ;; esac
     step traps $P -m experiments.traps --model $M --tau 1 --chains 16 --steps 3000 --every 10 \
       --window 150 --min_len 60 --restarts 8 --restart_steps 1500 --out $O/traps/$T ;;
+  bert_embed)   # steps that need the sentence embedder: Fig. 3 hitting times and Table 4 traps
+    step hitting $P -m experiments.hitting run --model bert-base-uncased --taus 0.5 1 1.5 2 \
+      --ns 10 20 50 100 --chains 100 --steps 5000 --every 5 --out $O/hitting/bert
+    step hitting_plot $P -m experiments.hitting plot --out $O/hitting/bert
+    step traps $P -m experiments.traps --model bert-base-uncased --tau 1 --chains 30 --steps 10000 \
+      --restarts 32 --out $O/traps/bert ;;
   topics_llm)   # rerun only the LLM-judge scoring and its summaries
     J="openrouter:${OPENROUTER_MODEL:-anthropic/claude-sonnet-4.5}"
     for T in bert roberta; do

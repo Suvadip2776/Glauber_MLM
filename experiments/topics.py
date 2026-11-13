@@ -111,8 +111,10 @@ def summarize(args):
     nl = pd.read_csv(out / f"scored_{tag}_null_texts.csv", keep_default_na=False)
     labs = [c[:-6] for c in df.columns if c.endswith("_score")]
     cols = [f"{l}_score" for l in labs]
+    for d in (df, nl):  # unscored texts are read back as empty strings
+        d[cols] = d[cols].apply(pd.to_numeric, errors="coerce")
     n0, m0 = len(df), len(nl)
-    df, nl = df.dropna(subset=cols), nl.dropna(subset=cols)
+    df, nl = df.dropna(subset=cols).copy(), nl.dropna(subset=cols).copy()
     if len(df) < n0 or len(nl) < m0:
         print(f"dropped {n0 - len(df)} chain texts and {m0 - len(nl)} null texts the scorer could not score")
     df["label"] = df[[f"{l}_score" for l in labs]].idxmax(1).str[:-6]
