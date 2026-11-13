@@ -148,9 +148,10 @@ class MaskedLM:
             return self.model(input_ids=ids, attention_mask=torch.ones_like(ids)).logits
         if self.family == "mdlm":
             try:
-                return self.model(input_ids=ids, timesteps=torch.zeros(ids.shape[0], device=ids.device)).logits
+                out = self.model(input_ids=ids, timesteps=torch.zeros(ids.shape[0], device=ids.device))
             except TypeError:
-                return self.model(ids).logits
+                out = self.model(ids)
+            return out.logits if hasattr(out, "logits") else out  # MDLM returns logits directly
         return self.model(ids).logits
 
     @torch.no_grad()

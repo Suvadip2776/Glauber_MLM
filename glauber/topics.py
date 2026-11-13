@@ -62,13 +62,15 @@ class OpenRouterJudge:
 
     def _one(self, text: str) -> Dict[str, float]:
         import requests
-        body = {"model": self.model, "temperature": 0,
+        body = {"model": self.model, "temperature": 0, "max_tokens": 400,
                 "messages": [{"role": "user", "content": JUDGE_PROMPT.format(topics=", ".join(self.topics), text=text)}]}
         for attempt in range(5):
             try:
                 r = requests.post(self.URL, headers={"Authorization": f"Bearer {self.key}"}, json=body, timeout=60)
                 r.raise_for_status()
-                content = r.json()["choices"][0]["message"]["content"]
+                content = r.json()["choices"][0]["message"].get("content")
+                if not content:
+                    raise ValueError("empty response")
                 d = json.loads(re.search(r"\{.*\}", content, re.S).group(0))
                 s = {k: float(d.get(k, 0.0)) for k in self.labels}
                 z = sum(s.values()) or 1.0
@@ -76,7 +78,8 @@ class OpenRouterJudge:
             except Exception as e:  # noqa: BLE001
                 err = e
                 time.sleep(2 ** attempt)
-        raise RuntimeError(f"OpenRouter failed: {err}")
+        print(f"OpenRouter gave no usable answer for {text[:60]!r}: {err}")
+        return {k: float("nan") for k in self.labels}  # dropped by `summarize`
 
     def __call__(self, texts: List[str], batch_size: int = 0) -> List[Dict[str, float]]:
         todo = sorted({t for t in texts if t not in self.cache})
@@ -84,6 +87,8 @@ class OpenRouterJudge:
             with ThreadPoolExecutor(self.workers) as ex:
                 for t, s in zip(todo, ex.map(self._one, todo)):
                     self.cache[t] = s
+                    if any(v != v for v in s.values()):  # NaN = failed; retry on the next run
+                        continue
                     with open(self.cache_path, "a") as f:
                         f.write(json.dumps({"model": self.model, "text": t, "scores": s}) + "\n")
         return [self.cache[t] for t in texts]

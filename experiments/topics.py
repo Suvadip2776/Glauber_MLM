@@ -110,6 +110,11 @@ def summarize(args):
     df = pd.read_csv(out / f"scored_{tag}_texts.csv", keep_default_na=False)
     nl = pd.read_csv(out / f"scored_{tag}_null_texts.csv", keep_default_na=False)
     labs = [c[:-6] for c in df.columns if c.endswith("_score")]
+    cols = [f"{l}_score" for l in labs]
+    n0, m0 = len(df), len(nl)
+    df, nl = df.dropna(subset=cols), nl.dropna(subset=cols)
+    if len(df) < n0 or len(nl) < m0:
+        print(f"dropped {n0 - len(df)} chain texts and {m0 - len(nl)} null texts the scorer could not score")
     df["label"] = df[[f"{l}_score" for l in labs]].idxmax(1).str[:-6]
     nl["label"] = nl[[f"{l}_score" for l in labs]].idxmax(1).str[:-6]
     df["chain"] = df["seed_topic"] + "_" + df["seed_id"].astype(str) + "_" + df["rep"].astype(str)

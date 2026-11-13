@@ -14,7 +14,7 @@ LOG=$O/logs/status_$STAGE.txt
 nvidia-smi --query-gpu=name,memory.total --format=csv | tee -a $LOG
 
 pip install -q --no-cache-dir "numpy<2.3" scipy pandas matplotlib tqdm datasets sentence-transformers \
-  requests sentencepiece accelerate einops pyarrow 2>&1 | tail -2
+  requests httpx sentencepiece accelerate einops pyarrow 2>&1 | tail -2
 pip install -q --no-cache-dir "transformers==${TRANSFORMERS_VERSION:-4.48.3}" 2>&1 | tail -2
 
 step() {  # step <name> <cmd...>   (a failing step is logged; the stage continues)
@@ -85,6 +85,17 @@ case $STAGE in
       done
     done
     ;;
+  llada_traps|dream_traps)   # rerun only the trap step of an MDM stage
+    M=$([ $STAGE = llada_traps ] && echo GSAI-ML/LLaDA-8B-Base || echo Dream-org/Dream-v0-Base-7B)
+    T=${STAGE%_traps}
+    step traps $P -m experiments.traps --model $M --tau 1 --chains 16 --steps 3000 --every 10 \
+      --window 150 --min_len 60 --restarts 8 --restart_steps 1500 --out $O/traps/$T ;;
+  topics_llm)   # rerun only the LLM-judge scoring and its summaries
+    J="openrouter:${OPENROUTER_MODEL:-anthropic/claude-sonnet-4.5}"
+    for T in bert roberta; do
+      step llm_$T $P -m experiments.topics score --out $O/topics/$T --backend openrouter
+      step sum_${T}_llm $P -m experiments.topics summarize --out $O/topics/$T --scorer "$J"
+    done ;;
   llada) mdm_suite GSAI-ML/LLaDA-8B-Base llada ;;
   dream) mdm_suite Dream-org/Dream-v0-Base-7B dream ;;
   mdlm)

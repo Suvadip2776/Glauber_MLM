@@ -7,9 +7,10 @@ matplotlib
 tqdm
 datasets                  # MS MARCO seeds
 sentence-transformers     # embedding-drift diagnostic only
+httpx                     # needed by recent sentence-transformers
 requests                  # OpenRouter judge only
 sentencepiece
 accelerate
 # MDM remote code (GPU only): LLaDA/Dream/MDLM
 einops
-# flash_attn  # MDLM requires it; install on a CUDA node: pip install flash-attn --no-build-isolation
+# flash-attn (MDLM only, CUDA): pip install "flash-attn==2.7.4.post1" --no-build-isolation
