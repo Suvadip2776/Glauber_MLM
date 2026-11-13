@@ -1,0 +1,62 @@
+{
+  "Health": [
+    "Doctors recommend eating vegetables and exercising regularly.",
+    "The hospital staff monitored the patient after the surgery.",
+    "A balanced diet and daily exercise can improve heart health.",
+    "The nurse checked the patient's blood pressure and temperature.",
+    "Vaccines help protect communities from infectious diseases.",
+    "The clinic offers regular checkups for children and adults.",
+    "Researchers studied how sleep affects the immune system.",
+    "The doctor prescribed medicine to reduce the patient's fever.",
+    "Physical therapy helped the athlete recover from the injury.",
+    "Public health campaigns encourage people to wash their hands."
+  ],
+  "Sport": [
+    "The team scored three goals in the final minutes to win.",
+    "The coach made several substitutions during the second half.",
+    "The tennis player served an ace to win the match.",
+    "Fans cheered loudly after the championship game ended.",
+    "The runner trained every morning before the marathon.",
+    "The basketball team practiced shooting and defense after school.",
+    "The goalkeeper blocked a powerful shot in the final minute.",
+    "The baseball player hit a home run into left field.",
+    "The swimmer broke the record in the final race.",
+    "The referee stopped the game after a foul was committed."
+  ],
+  "Science": [
+    "Researchers discovered a new species of deep sea fish.",
+    "The experiment measured how plants respond to sunlight.",
+    "Astronomers observed a distant galaxy through the telescope.",
+    "The laboratory tested samples collected from the river.",
+    "Scientists developed a model to explain the chemical reaction.",
+    "The fossil record provides evidence about ancient animals.",
+    "The physics class studied motion, energy, and force.",
+    "A new satellite collected data about Earth's atmosphere.",
+    "Biologists analyzed the behavior of insects in the forest.",
+    "The microscope revealed tiny structures inside the cell."
+  ],
+  "Food": [
+    "The chef prepared a dish using fresh tomatoes and garlic.",
+    "The bakery sold warm bread and sweet pastries every morning.",
+    "She cooked rice with vegetables and spices for dinner.",
+    "The restaurant served soup, salad, and grilled chicken.",
+    "Fresh fruit and yogurt made a simple breakfast.",
+    "The recipe called for butter, flour, sugar, and eggs.",
+    "They roasted potatoes with herbs and olive oil.",
+    "The kitchen smelled like cinnamon and baked apples.",
+    "He sliced onions and peppers before making the sauce.",
+    "The family shared pasta, bread, and soup at the table."
+  ],
+  "Technology": [
+    "The new smartphone has a faster processor and better camera.",
+    "Engineers tested the software update before releasing it.",
+    "The computer stored files on a secure cloud server.",
+    "A new battery design improved the electric car's range.",
+    "The website loaded quickly after the database was optimized.",
+    "The robot used sensors to navigate through the room.",
+    "Programmers fixed bugs in the mobile application.",
+    "The wireless network connected laptops, phones, and tablets.",
+    "The company designed a chip for artificial intelligence systems.",
+    "The camera software improved image quality in low light."
+  ]
+}

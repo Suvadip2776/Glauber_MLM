@@ -1,0 +1,15 @@
+torch>=2.0
+transformers>=4.48        # ModernBERT needs >=4.48
+numpy
+scipy
+pandas
+matplotlib
+tqdm
+datasets                  # MS MARCO seeds
+sentence-transformers     # embedding-drift diagnostic only
+requests                  # OpenRouter judge only
+sentencepiece
+accelerate
+# MDM remote code (GPU only): LLaDA/Dream/MDLM
+einops
+# flash_attn  # MDLM requires it; install on a CUDA node: pip install flash-attn --no-build-isolation
