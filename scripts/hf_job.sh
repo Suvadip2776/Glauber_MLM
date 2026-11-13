@@ -92,12 +92,25 @@ case $STAGE in
             pip install -q --no-cache-dir "flash-attn==2.7.4.post1" --no-build-isolation 2>&1 | tail -2 ;; esac
     step traps $P -m experiments.traps --model $M --tau 1 --chains 16 --steps 3000 --every 10 \
       --window 150 --min_len 60 --restarts 8 --restart_steps 1500 --out $O/traps/$T ;;
+  bert_basin_rest)   # bert_basin without the slow adversarial drift
+    step drift_random $P -m experiments.drift_basin drift --ref_token '!' --N 100 --taus 0.5 1 --fill random \
+      --states 100 --out $O/drift/bang
+    step escape $P -m experiments.drift_basin escape --ref_token '!' --Ns 10 20 40 60 80 100 --tau 1 \
+      --chains 64 --steps 20000 --out $O/drift/bang
+    step entry $P -m experiments.drift_basin entry --ref_token '!' --Ns 10 20 40 60 80 100 --tau 1 \
+      --chains 64 --steps 20000 --out $O/drift/bang
+    step certify $P -m experiments.drift_basin certify --out $O/drift/bang
+    step influence $P -m experiments.influence --model bert-base-uncased --out $O/influence/bert ;;
   bert_embed)   # steps that need the sentence embedder: Fig. 3 hitting times and Table 4 traps
     step hitting $P -m experiments.hitting run --model bert-base-uncased --taus 0.5 1 1.5 2 \
       --ns 10 20 50 100 --chains 100 --steps 5000 --every 5 --out $O/hitting/bert
     step hitting_plot $P -m experiments.hitting plot --out $O/hitting/bert
     step traps $P -m experiments.traps --model bert-base-uncased --tau 1 --chains 30 --steps 10000 \
       --restarts 32 --out $O/traps/bert ;;
+  bert_finish)  # adversarial drift (fewer states, optimised at tau=1) and influence coefficients
+    step influence $P -m experiments.influence --model bert-base-uncased --out $O/influence/bert
+    step drift_adversarial $P -m experiments.drift_basin drift --ref_token '!' --N 100 --taus 1 0.5 \
+      --fill adversarial --states 48 --levels 0.5 0.6 0.7 0.8 0.9 0.95 --out $O/drift/bang ;;
   topics_llm)   # rerun only the LLM-judge scoring and its summaries
     J="openrouter:${OPENROUTER_MODEL:-anthropic/claude-sonnet-4.5}"
     for T in bert roberta; do
